@@ -1,0 +1,73 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: bugReport
+  namespace: icoastline-test
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: icoastline
+        module: bugReport
+        env: test
+    spec:
+      containers:
+      - name: bugReport
+        image: registry.dev.com:5000/icoastline/bugReport:IMAGE_VERSION
+        env: 
+        - name: NODE_ENV
+          valueFrom:
+            configMapKeyRef:
+              name: db-config
+              key: NODE_ENV
+        - name: HTTPPORT
+          valueFrom:
+            configMapKeyRef:
+              name: db-config
+              key: HTTPPORT
+        - name: DBURL_BUG
+          valueFrom:
+            configMapKeyRef:
+              name: db-config
+              key: DBURL_BUG
+---
+kind: Service
+apiVersion: v1
+metadata:
+  labels:
+    app: icoastline
+    module: bugReport
+    env: test
+  name: bugReport
+  namespace: icoastline-test
+spec:
+  ports:
+  - port: 80
+    targetPort: 80
+  selector:
+    app: icoastline
+    module: bugReport
+    env: test
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: bugReport
+  namespace: icoastline-test
+spec:
+  rules:
+  - host: tests.icoastline.cn
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: bugReport
+          servicePort: 80
+  - host: bugReport.icoastline.cn
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: bugReport
+          servicePort: 80
