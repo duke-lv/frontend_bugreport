@@ -1,7 +1,7 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: bugReport
+  name: bugreport
   namespace: icoastline-test
 spec:
   replicas: 1
@@ -9,12 +9,12 @@ spec:
     metadata:
       labels:
         app: icoastline
-        module: bugReport
+        module: bugreport
         env: test
     spec:
       containers:
-      - name: bugReport
-        image: registry.dev.com:5000/icoastline/bugReport:IMAGE_VERSION
+      - name: bugreport
+        image: registry.dev.com:5000/icoastline/bugreport:IMAGE_VERSION
         env: 
         - name: NODE_ENV
           valueFrom:
@@ -37,9 +37,9 @@ apiVersion: v1
 metadata:
   labels:
     app: icoastline
-    module: bugReport
+    module: bugreport
     env: test
-  name: bugReport
+  name: bugreport
   namespace: icoastline-test
 spec:
   ports:
@@ -47,13 +47,13 @@ spec:
     targetPort: 80
   selector:
     app: icoastline
-    module: bugReport
+    module: bugreport
     env: test
 ---
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: bugReport
+  name: bugreport
   namespace: icoastline-test
 spec:
   rules:
@@ -62,12 +62,12 @@ spec:
       paths:
       - path: /
         backend:
-          serviceName: bugReport
+          serviceName: bugreport
           servicePort: 80
-  - host: bugReport.icoastline.cn
+  - host: bugreport.icoastline.cn
     http:
       paths:
       - path: /
         backend:
-          serviceName: bugReport
+          serviceName: bugreport
           servicePort: 80
